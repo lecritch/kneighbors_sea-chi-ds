@@ -22,10 +22,6 @@ Titanic is a binary classification problem, with our target being the Survived f
 
 We will hold of from KFold or crossval for now, so that our notebook is more comprehensible.
 
-#### Then perform another tts, and put aside the test set from above until the end
-
-We will hold of from KFold or crossval for now, so that our notebook is more comprehensible.
-
 # Quick review of confusion matrix and our metrics: 
   
 
@@ -134,6 +130,12 @@ If we change the distance metric, our prediction should change for K = 5.
 
 You may have suspected that we were leaving something out. For any distance based algorithms, scaling is very important.  Look at how the shape of array changes before and after scaling.
 
+![non-normal](img/nonnormal.png)
+
+![normal](img/normalized.png)
+
+Let's look at our data for viz dataset
+
 Look at how much that changes things.
 
 Look at 166 to 150.  
@@ -207,9 +209,6 @@ lr = LogisticRegression(max_iter=1000)
 
 ```
 
-    3.99 ms ± 152 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-
-
 
 ```python
 
@@ -217,17 +216,11 @@ knn = KNeighborsClassifier()
 %timeit knn.fit(X,y)
 ```
 
-    682 µs ± 13.2 µs per loop (mean ± std. dev. of 7 runs, 1000 loops each)
-
-
 
 ```python
 
 %timeit knn.predict(X)
 ```
-
-    18.2 ms ± 335 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
-
 
 # Tuning K
 
