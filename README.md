@@ -3,6 +3,14 @@
 
 ![wilson](img/wilson.jpg)
 
+# Agenda
+1. FSM and metric review
+2. KNN Under the Hood: Voting for K
+3. Different types of distance
+4. Importance of Scaling
+5. Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
+6. Tuning K and the BV Tradeoff
+
 KNearest Neighbors is our second classification algorithm in our toolbelt added to our logistic regression classifier.
 
 If we remember, logistic regression is a supervised, parametric, discriminative model.
@@ -36,6 +44,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from src.student_caller import one_random_student
+
+import warnings
+warnings.filterwarnings('ignore')
 ```
 
 ## Let's load in our trusty Titanic dataset
@@ -73,7 +84,7 @@ We will hold of from KFold or crossval for now, so that our notebook is more com
 
 
 ```python
-X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
+X_t, X_val, y_t, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
 ```
 
 
@@ -86,11 +97,11 @@ from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier()
 
 mm = MinMaxScaler()
-X_train = mm.fit_transform(X_train)
+X_t = mm.fit_transform(X_t)
 X_val = mm.transform(X_val)
 
-knn.fit(X_train, y_train)
-print(f"training accuracy: {knn.score(X_train, y_train)}")
+knn.fit(X_t, y_t)
+print(f"training accuracy: {knn.score(X_t, y_t)}")
 print(f"Val accuracy: {knn.score(X_val, y_val)}")
 
 y_hat = knn.predict(X_val)
@@ -133,7 +144,7 @@ question = 'Which will be higher: precision or recall'
 one_random_student(mccalister, question)
 ```
 
-# KNN: Under the Hood
+# 2. KNN Under the Hood: Voting for K
 
 For visualization purposes, let's pull out a small subset of our training data, and create a model using only two dimensions: Age and Fare.
 
@@ -141,15 +152,15 @@ For visualization purposes, let's pull out a small subset of our training data, 
 
 ```python
 X_train, X_test, y_train, y_test = train_test_split(X,y, random_state=42, test_size = .25)
-X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
+X_t, X_val, y_t, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
 ```
 
 
 ```python
 import seaborn as sns
 
-X_for_viz = X_train.sample(15, random_state=40)
-y_for_viz = y_train[X_for_viz.index]
+X_for_viz = X_t.sample(15, random_state=40)
+y_for_viz = y_t[X_for_viz.index]
 
 fig, ax = plt.subplots(figsize=(10,10))
 sns.scatterplot(X_for_viz['Age'], X_for_viz['Fare'], 
@@ -168,8 +179,8 @@ Let's drop a point from our validation set into the plot above.
 
 
 ```python
-X_for_viz = X_train.sample(15, random_state=40)
-y_for_viz = y_train[X_for_viz.index]
+X_for_viz = X_t.sample(15, random_state=40)
+y_for_viz = y_t[X_for_viz.index]
 
 fig, ax = plt.subplots(figsize=(10,10))
 sns.scatterplot(X_for_viz['Age'], X_for_viz['Fare'], hue=y_for_viz, palette={0:'red', 1:'green'}, s=200, ax=ax)
@@ -237,8 +248,8 @@ Let's update our plot to add indexes.
 
 
 ```python
-X_for_viz = X_train.sample(15, random_state=40)
-y_for_viz = y_train[X_for_viz.index]
+X_for_viz = X_t.sample(15, random_state=40)
+y_for_viz = y_t[X_for_viz.index]
 
 fig, ax = plt.subplots(figsize=(10,10))
 sns.scatterplot(X_for_viz['Age'], X_for_viz['Fare'], hue=y_for_viz, 
@@ -320,7 +331,7 @@ What K was correct?
 new_y
 ```
 
-# Different types of distance
+# 3. Different types of distance
 
 How did the algo calculate those distances? 
 
@@ -477,7 +488,7 @@ df_for_viz.iloc[nearest[1][0]]
 
 ```python
 from src.plot_train import plot_train
-plot_train(X_train, y_train, X_val, y_val)
+plot_train(X_t, y_t, X_val, y_val)
 ```
 
 If we change the distance metric, our prediction should change for K = 5.
@@ -504,7 +515,7 @@ knn_man.predict(new_x)
 new_y
 ```
 
-# Scaling
+# 4. Importance of Scaling
 
 You may have suspected that we were leaving something out. For any distance based algorithms, scaling is very important.  Look at how the shape of array changes before and after scaling.
 
@@ -519,25 +530,25 @@ Let's look at our data for viz dataset
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, random_state=42, test_size = .25)
-X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
+X_t, X_val, y_t, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
 
 knn = KNeighborsClassifier()
 
 ss = StandardScaler()
-X_ind = X_train.index
-X_col = X_train.columns
+X_ind = X_t.index
+X_col = X_t.columns
 
-X_train_s = pd.DataFrame(ss.fit_transform(X_train))
-X_train_s.index = X_ind
-X_train_s.columns = X_col
+X_t_s = pd.DataFrame(ss.fit_transform(X_t))
+X_t_s.index = X_ind
+X_t_s.columns = X_col
 
 X_v_ind = X_val.index
 X_val_s = pd.DataFrame(ss.transform(X_val))
 X_val_s.index = X_v_ind
 X_val_s.columns = X_col
 
-knn.fit(X_train_s, y_train)
-print(f"training accuracy: {knn.score(X_train_s, y_train)}")
+knn.fit(X_t_s, y_t)
+print(f"training accuracy: {knn.score(X_t_s, y_t)}")
 print(f"Val accuracy: {knn.score(X_val_s, y_val)}")
 
 y_hat = knn.predict(X_val_s)
@@ -547,8 +558,8 @@ y_hat = knn.predict(X_val_s)
 
 
 ```python
-plot_train(X_train, y_train, X_val, y_val)
-plot_train(X_train_s, y_train, X_val_s, y_val, -2.5,2.5, text_pos=.1 )
+plot_train(X_t, y_t, X_val, y_val)
+plot_train(X_t_s, y_t, X_val_s, y_val, -2,2, text_pos=.1 )
 ```
 
 Look at how much that changes things.
@@ -567,32 +578,32 @@ X = titanic[['Age', 'Fare']]
 y = titanic['Survived']
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, random_state=42, test_size = .25)
-X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
+X_t, X_val, y_t, y_val = train_test_split(X_train,y_train, random_state=42, test_size = .25)
 
-predict_one(X_train, X_val, y_train, y_val)
+predict_one(X_t, X_val, y_t, y_val)
 ```
 
 
 ```python
-ss = StandardScaler()
+mm = MinMaxScaler()
 
-X_train_s = pd.DataFrame(ss.fit_transform(X_train))
-X_train_s.index = X_train.index
-X_train_s.columns = X_train.columns
+X_t_s = pd.DataFrame(mm.fit_transform(X_t))
+X_t_s.index = X_t.index
+X_t_s.columns = X_t.columns
 
-X_val_s = pd.DataFrame(ss.transform(X_val))
+X_val_s = pd.DataFrame(mm.transform(X_val))
 X_val_s.index = X_val.index
 X_val_s.columns = X_val.columns
 
 
-predict_one(X_train_s, X_val_s, y_train, y_val)
+predict_one(X_t_s, X_val_s, y_t, y_val)
 ```
 
 ## Should we use a Standard Scaler or Min-Max Scaler?  
 https://sebastianraschka.com/Articles/2014_about_feature_scaling.html   
 http://datareality.blogspot.com/2016/11/scaling-normalizing-standardizing-which.html
 
-# Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
+# 5. Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
 
 ## Supervised
 You should be very comfortable with the idea of supervised learning by now.  Supervised learning involves labels.  KNN needs labels for the voting process.
@@ -611,7 +622,7 @@ knn.__dict__
 
 
 ```python
-knn.fit(X_train_s, y_train)
+knn.fit(X_t_s, y_t)
 knn.__dict__
 ```
 
@@ -672,6 +683,8 @@ for word in emma:
 
 
 ```python
+import nltk 
+emma = nltk.corpus.gutenberg.words('austen-emma.txt')
 %timeit newlist = [s.upper() for s in emma]
 ```
 
@@ -688,7 +701,7 @@ for word in emma:
 
 ```python
 #__SOLUTION__
- 
+from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(max_iter=1000)
 %timeit lr.fit(X,y)
 
@@ -709,7 +722,7 @@ knn = KNeighborsClassifier()
 %timeit knn.predict(X)
 ```
 
-# Tuning K
+# 6. Tuning K and the BV Tradeoff
 
 
 ```python
@@ -829,4 +842,9 @@ recall_score(y_test, y_hat)
 
 ```python
 precision_score(y_test, y_hat)
+```
+
+
+```python
+
 ```
