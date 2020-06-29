@@ -3,6 +3,14 @@
 
 ![wilson](img/wilson.jpg)
 
+# Agenda
+1. FSM and metric review
+2. KNN Under the Hood: Voting for K
+3. Different types of distance
+4. Importance of Scaling
+5. Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
+6. Tuning K and the BV Tradeoff
+
 KNearest Neighbors is our second classification algorithm in our toolbelt added to our logistic regression classifier.
 
 If we remember, logistic regression is a supervised, parametric, discriminative model.
@@ -25,7 +33,7 @@ We will hold of from KFold or crossval for now, so that our notebook is more com
 # Quick review of confusion matrix and our metrics: 
   
 
-# KNN: Under the Hood
+# 2. KNN Under the Hood: Voting for K
 
 For visualization purposes, let's pull out a small subset of our training data, and create a model using only two dimensions: Age and Fare.
 
@@ -61,7 +69,7 @@ Let's iterate through K, 1 through 10, and see the predictions.
 
 What K was correct?
 
-# Different types of distance
+# 3. Different types of distance
 
 How did the algo calculate those distances? 
 
@@ -126,7 +134,7 @@ def manhattan(train_X, index, val_X):
 
 If we change the distance metric, our prediction should change for K = 5.
 
-# Scaling
+# 4. Importance of Scaling
 
 You may have suspected that we were leaving something out. For any distance based algorithms, scaling is very important.  Look at how the shape of array changes before and after scaling.
 
@@ -147,7 +155,7 @@ Now let's run our classifier on scaled data and compare to unscaled.
 https://sebastianraschka.com/Articles/2014_about_feature_scaling.html   
 http://datareality.blogspot.com/2016/11/scaling-normalizing-standardizing-which.html
 
-# Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
+# 5. Let's unpack: KNN is a supervised, non-parametric, descriminative, lazy-learning algorithm
 
 ## Supervised
 You should be very comfortable with the idea of supervised learning by now.  Supervised learning involves labels.  KNN needs labels for the voting process.
@@ -203,7 +211,7 @@ Time it example
 
 
 ```python
- 
+from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(max_iter=1000)
 %timeit lr.fit(X,y)
 
@@ -222,7 +230,7 @@ knn = KNeighborsClassifier()
 %timeit knn.predict(X)
 ```
 
-# Tuning K
+# 6. Tuning K and the BV Tradeoff
 
 ### What value of K performs best on our Test data?
 
